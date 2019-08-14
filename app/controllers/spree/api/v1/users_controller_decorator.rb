@@ -18,6 +18,9 @@ module Spree
           else
             user = Spree::User.find_by_email(params[:email]) || Spree::User.new
             user.apply_omniauth(omniauth_hash)
+
+            user.generate_spree_api_key! if user.spree_api_key.blank?
+
             if user.save!
               render_user_login(user)
             end
@@ -31,8 +34,8 @@ module Spree
 
         def oauth_providers
           auth_methods = Spree::AuthenticationMethod.active_authentication_methods
-          auth_methods.map! do |auth_method|
-            oauth_provider = SpreeSocial::OAUTH_PROVIDERS.detect {|p| p[1] == provider}
+          auth_methods = auth_methods.map do |auth_method|
+            oauth_provider = SpreeSocial::OAUTH_PROVIDERS.detect {|p| p[1] == auth_method.provider}
             {
                 name: oauth_provider[0],
                 provider: auth_method.provider,
