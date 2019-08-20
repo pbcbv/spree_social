@@ -17,7 +17,7 @@ Spree::Core::Engine.add_routes do
       resources :users do
         collection do
           post :social_login
-          post 'social_login/:provider', to: :social_login
+          post 'social_login/:provider', to: :social_login, action: :social_login
           get :oauth_providers
         end
       end
