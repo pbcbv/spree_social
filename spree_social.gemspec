@@ -47,4 +47,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rubocop', '>= 0.24.1'
   s.add_development_dependency 'ruby_dep', '~> 1.3.0'
   s.add_development_dependency 'rake', '< 11.0'
+  s.add_development_dependency 'spree_sample'
+  s.add_development_dependency 'appraisal'
 end
