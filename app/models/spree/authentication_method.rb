@@ -25,6 +25,10 @@ class Spree::AuthenticationMethod < ActiveRecord::Base
     errors.add(:provider, 'must be backed by an omniauth strategy') unless strategy_class
   end
 
+  def access_token(token)
+    ::OAuth2::AccessToken.new(client, token)
+  end
+
   private
 
   def strategy_class
@@ -39,10 +43,6 @@ class Spree::AuthenticationMethod < ActiveRecord::Base
     ::OAuth2::Client.new(api_key, api_secret, strategy_class.default_options.client_options.to_h).tap do |c|
       c.site = strategy_class.default_options.client_options['site']
     end
-  end
-
-  def access_token(token)
-    ::OAuth2::AccessToken.new(client, token)
   end
 
   def strategy(token)
