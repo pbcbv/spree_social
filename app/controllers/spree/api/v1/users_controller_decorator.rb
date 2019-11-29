@@ -10,18 +10,17 @@ module Spree
           authentication = Spree::UserAuthentication.find_by_provider_and_uid(params[:provider], omniauth_hash['uid'])
 
           if authentication.present? and authentication.try(:user).present?
-            render_user_login(authentication.user)
-          elsif @current_api_user.persisted?
-            @current_api_user.apply_omniauth(omniauth_hash)
-            @current_api_user.save!
-            render_user_login(@current_api_user)
+            user = authentication.try(:user)
+          elsif current_api_user&.persisted? || Spree::User.exists?(email: omniauth_hash.info.email)
+            user = Spree::User.find_by_email(omniauth_hash.info.email)
+            authentication = user.apply_omniauth(omniauth_hash)
+            user.save!
           else
-            user = Spree::User.find_by_email(params[:email]) || Spree::User.new
+            user = Spree::User.new
             user.apply_omniauth(omniauth_hash)
 
             if user.save!
               user.generate_spree_api_key! if user.spree_api_key.blank?
-              render_user_login(user)
             end
           end
 
@@ -29,6 +28,8 @@ module Spree
             user = @current_api_user || authentication.user
             @order.associate_user!(user)
           end
+
+          render_user_login(user)
         end
 
         def oauth_providers
