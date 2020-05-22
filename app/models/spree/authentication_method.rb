@@ -29,8 +29,6 @@ class Spree::AuthenticationMethod < ActiveRecord::Base
     ::OAuth2::AccessToken.new(client, token)
   end
 
-  private
-
   def strategy_class
     begin
       "::OmniAuth::Strategies::#{provider.classify}".constantize
@@ -45,9 +43,9 @@ class Spree::AuthenticationMethod < ActiveRecord::Base
     end
   end
 
-  def strategy(token)
+  def strategy(token, options = {})
     app = lambda {|env| [200, {}, ["Hello World."]]}
-    options = [api_key, api_secret]
+    options = [api_key, api_secret, options]
     strategy_class.new(app, *options).tap {|s| s.access_token = access_token(token)}
   end
 end
